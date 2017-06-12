@@ -8,9 +8,12 @@
  *
  * @author    walkor<walkor@workerman.net>
  * @copyright walkor<walkor@workerman.net>
+ *
  * @link      http://www.workerman.net/
+ *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace Workerman\Protocols;
 
 use Workerman\Connection\TcpConnection;
@@ -25,6 +28,7 @@ class Text
      *
      * @param string        $buffer
      * @param TcpConnection $connection
+     *
      * @return int
      */
     public static function input($buffer, TcpConnection $connection)
@@ -32,6 +36,7 @@ class Text
         // Judge whether the package length exceeds the limit.
         if (strlen($buffer) >= TcpConnection::$maxPackageSize) {
             $connection->close();
+
             return 0;
         }
         //  Find the position of  "\n".
@@ -48,18 +53,20 @@ class Text
      * Encode.
      *
      * @param string $buffer
+     *
      * @return string
      */
     public static function encode($buffer)
     {
         // Add "\n"
-        return $buffer . "\n";
+        return $buffer."\n";
     }
 
     /**
      * Decode.
      *
      * @param string $buffer
+     *
      * @return string
      */
     public static function decode($buffer)

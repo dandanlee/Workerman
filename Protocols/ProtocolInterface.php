@@ -8,15 +8,18 @@
  *
  * @author    walkor<walkor@workerman.net>
  * @copyright walkor<walkor@workerman.net>
+ *
  * @link      http://www.workerman.net/
+ *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace Workerman\Protocols;
 
 use Workerman\Connection\ConnectionInterface;
 
 /**
- * Protocol interface
+ * Protocol interface.
  */
 interface ProtocolInterface
 {
@@ -28,6 +31,7 @@ interface ProtocolInterface
      *
      * @param ConnectionInterface $connection
      * @param string              $recv_buffer
+     *
      * @return int|false
      */
     public static function input($recv_buffer, ConnectionInterface $connection);
@@ -37,6 +41,7 @@ interface ProtocolInterface
      *
      * @param ConnectionInterface $connection
      * @param string              $recv_buffer
+     *
      * @return mixed
      */
     public static function decode($recv_buffer, ConnectionInterface $connection);
@@ -46,6 +51,7 @@ interface ProtocolInterface
      *
      * @param ConnectionInterface $connection
      * @param mixed               $data
+     *
      * @return string
      */
     public static function encode($data, ConnectionInterface $connection);

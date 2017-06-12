@@ -8,27 +8,30 @@
  *
  * @author    walkor<walkor@workerman.net>
  * @copyright walkor<walkor@workerman.net>
+ *
  * @link      http://www.workerman.net/
+ *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace Workerman\Connection;
 
 /**
  * ConnectionInterface.
  */
-abstract class  ConnectionInterface
+abstract class ConnectionInterface
 {
     /**
      * Statistics for status command.
      *
      * @var array
      */
-    public static $statistics = array(
+    public static $statistics = [
         'connection_count' => 0,
         'total_request'    => 0,
         'throw_exception'  => 0,
         'send_fail'        => 0,
-    );
+    ];
 
     /**
      * Emitted when data is received.
@@ -55,7 +58,8 @@ abstract class  ConnectionInterface
      * Sends data on the connection.
      *
      * @param string $send_buffer
-     * @return void|boolean
+     *
+     * @return void|bool
      */
     abstract public function send($send_buffer);
 
@@ -77,6 +81,7 @@ abstract class  ConnectionInterface
      * Close connection.
      *
      * @param $data
+     *
      * @return void
      */
     abstract public function close($data = null);

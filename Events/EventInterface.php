@@ -8,9 +8,12 @@
  *
  * @author    walkor<walkor@workerman.net>
  * @copyright walkor<walkor@workerman.net>
+ *
  * @link      http://www.workerman.net/
+ *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace Workerman\Events;
 
 interface EventInterface
@@ -57,6 +60,7 @@ interface EventInterface
      * @param int      $flag
      * @param callable $func
      * @param mixed    $args
+     *
      * @return bool
      */
     public function add($fd, $flag, $func, $args = null);
@@ -66,6 +70,7 @@ interface EventInterface
      *
      * @param mixed $fd
      * @param int   $flag
+     *
      * @return bool
      */
     public function del($fd, $flag);

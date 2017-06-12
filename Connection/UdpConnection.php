@@ -8,9 +8,12 @@
  *
  * @author    walkor<walkor@workerman.net>
  * @copyright walkor<walkor@workerman.net>
+ *
  * @link      http://www.workerman.net/
+ *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace Workerman\Connection;
 
 /**
@@ -48,7 +51,7 @@ class UdpConnection extends ConnectionInterface
      */
     public function __construct($socket, $remote_address)
     {
-        $this->_socket        = $socket;
+        $this->_socket = $socket;
         $this->_remoteAddress = $remote_address;
     }
 
@@ -57,17 +60,19 @@ class UdpConnection extends ConnectionInterface
      *
      * @param string $send_buffer
      * @param bool   $raw
-     * @return void|boolean
+     *
+     * @return void|bool
      */
     public function send($send_buffer, $raw = false)
     {
         if (false === $raw && $this->protocol) {
-            $parser      = $this->protocol;
+            $parser = $this->protocol;
             $send_buffer = $parser::encode($send_buffer, $this);
             if ($send_buffer === '') {
-                return null;
+                return;
             }
         }
+
         return strlen($send_buffer) === stream_socket_sendto($this->_socket, $send_buffer, 0, $this->_remoteAddress);
     }
 
@@ -82,6 +87,7 @@ class UdpConnection extends ConnectionInterface
         if ($pos) {
             return trim(substr($this->_remoteAddress, 0, $pos), '[]');
         }
+
         return '';
     }
 
@@ -93,8 +99,9 @@ class UdpConnection extends ConnectionInterface
     public function getRemotePort()
     {
         if ($this->_remoteAddress) {
-            return (int)substr(strrchr($this->_remoteAddress, ':'), 1);
+            return (int) substr(strrchr($this->_remoteAddress, ':'), 1);
         }
+
         return 0;
     }
 
@@ -103,6 +110,7 @@ class UdpConnection extends ConnectionInterface
      *
      * @param mixed $data
      * @param bool  $raw
+     *
      * @return bool
      */
     public function close($data = null, $raw = false)
@@ -110,6 +118,7 @@ class UdpConnection extends ConnectionInterface
         if ($data !== null) {
             $this->send($data, $raw);
         }
+
         return true;
     }
 }
