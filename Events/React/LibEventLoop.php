@@ -8,15 +8,18 @@
  *
  * @author    walkor<walkor@workerman.net>
  * @copyright walkor<walkor@workerman.net>
+ *
  * @link      http://www.workerman.net/
+ *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace Workerman\Events\React;
+
 use Workerman\Events\EventInterface;
 
 /**
- * Class LibEventLoop
- * @package Workerman\Events\React
+ * Class LibEventLoop.
  */
 class LibEventLoop extends \React\EventLoop\LibEventLoop
 {
@@ -32,12 +35,12 @@ class LibEventLoop extends \React\EventLoop\LibEventLoop
      *
      * @var array
      */
-    protected $_signalEvents = array();
+    protected $_signalEvents = [];
 
     /**
      * @var array
      */
-    protected $_timerIdMap = array();
+    protected $_timerIdMap = [];
 
     /**
      * @var int
@@ -51,11 +54,12 @@ class LibEventLoop extends \React\EventLoop\LibEventLoop
      * @param $flag
      * @param $func
      * @param array $args
+     *
      * @return bool
      */
-    public function add($fd, $flag, $func, $args = array())
+    public function add($fd, $flag, $func, $args = [])
     {
-        $args = (array)$args;
+        $args = (array) $args;
         switch ($flag) {
             case EventInterface::EV_READ:
                 return $this->addReadStream($fd, $func);
@@ -64,18 +68,21 @@ class LibEventLoop extends \React\EventLoop\LibEventLoop
             case EventInterface::EV_SIGNAL:
                 return $this->addSignal($fd, $func);
             case EventInterface::EV_TIMER:
-                $timer_obj = $this->addPeriodicTimer($fd, function() use ($func, $args) {
+                $timer_obj = $this->addPeriodicTimer($fd, function () use ($func, $args) {
                     call_user_func_array($func, $args);
                 });
                 $this->_timerIdMap[++$this->_timerIdIndex] = $timer_obj;
+
                 return $this->_timerIdIndex;
             case EventInterface::EV_TIMER_ONCE:
-                $timer_obj = $this->addTimer($fd, function() use ($func, $args) {
+                $timer_obj = $this->addTimer($fd, function () use ($func, $args) {
                     call_user_func_array($func, $args);
                 });
                 $this->_timerIdMap[++$this->_timerIdIndex] = $timer_obj;
+
                 return $this->_timerIdIndex;
         }
+
         return false;
     }
 
@@ -84,6 +91,7 @@ class LibEventLoop extends \React\EventLoop\LibEventLoop
      *
      * @param mixed $fd
      * @param int   $flag
+     *
      * @return bool
      */
     public function del($fd, $flag)
@@ -96,17 +104,18 @@ class LibEventLoop extends \React\EventLoop\LibEventLoop
             case EventInterface::EV_SIGNAL:
                 return $this->removeSignal($fd);
             case EventInterface::EV_TIMER:
-            case EventInterface::EV_TIMER_ONCE;
-                if (isset($this->_timerIdMap[$fd])){
+            case EventInterface::EV_TIMER_ONCE:
+                if (isset($this->_timerIdMap[$fd])) {
                     $timer_obj = $this->_timerIdMap[$fd];
                     unset($this->_timerIdMap[$fd]);
                     $this->cancelTimer($timer_obj);
+
                     return true;
                 }
         }
+
         return false;
     }
-
 
     /**
      * Main loop.
@@ -135,6 +144,7 @@ class LibEventLoop extends \React\EventLoop\LibEventLoop
      *
      * @param $signal
      * @param $callback
+     *
      * @return bool
      */
     public function addSignal($signal, $callback)

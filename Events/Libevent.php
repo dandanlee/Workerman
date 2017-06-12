@@ -8,15 +8,18 @@
  *
  * @author    walkor<walkor@workerman.net>
  * @copyright walkor<walkor@workerman.net>
+ *
  * @link      http://www.workerman.net/
+ *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace Workerman\Events;
 
 use Workerman\Worker;
 
 /**
- * libevent eventloop
+ * libevent eventloop.
  */
 class Libevent implements EventInterface
 {
@@ -32,25 +35,25 @@ class Libevent implements EventInterface
      *
      * @var array
      */
-    protected $_allEvents = array();
+    protected $_allEvents = [];
 
     /**
      * Event listeners of signal.
      *
      * @var array
      */
-    protected $_eventSignal = array();
+    protected $_eventSignal = [];
 
     /**
      * All timer event listeners.
-     * [func, args, event, flag, time_interval]
+     * [func, args, event, flag, time_interval].
      *
      * @var array
      */
-    protected $_eventTimer = array();
+    protected $_eventTimer = [];
 
     /**
-     * construct
+     * construct.
      */
     public function __construct()
     {
@@ -60,12 +63,12 @@ class Libevent implements EventInterface
     /**
      * {@inheritdoc}
      */
-    public function add($fd, $flag, $func, $args = array())
+    public function add($fd, $flag, $func, $args = [])
     {
         switch ($flag) {
             case self::EV_SIGNAL:
-                $fd_key                      = (int)$fd;
-                $real_flag                   = EV_SIGNAL | EV_PERSIST;
+                $fd_key = (int) $fd;
+                $real_flag = EV_SIGNAL | EV_PERSIST;
                 $this->_eventSignal[$fd_key] = event_new();
                 if (!event_set($this->_eventSignal[$fd_key], $fd, $real_flag, $func, null)) {
                     return false;
@@ -76,12 +79,13 @@ class Libevent implements EventInterface
                 if (!event_add($this->_eventSignal[$fd_key])) {
                     return false;
                 }
+
                 return true;
             case self::EV_TIMER:
             case self::EV_TIMER_ONCE:
-                $event    = event_new();
-                $timer_id = (int)$event;
-                if (!event_set($event, 0, EV_TIMEOUT, array($this, 'timerCallback'), $timer_id)) {
+                $event = event_new();
+                $timer_id = (int) $event;
+                if (!event_set($event, 0, EV_TIMEOUT, [$this, 'timerCallback'], $timer_id)) {
                     return false;
                 }
 
@@ -93,11 +97,12 @@ class Libevent implements EventInterface
                 if (!event_add($event, $time_interval)) {
                     return false;
                 }
-                $this->_eventTimer[$timer_id] = array($func, (array)$args, $event, $flag, $time_interval);
+                $this->_eventTimer[$timer_id] = [$func, (array) $args, $event, $flag, $time_interval];
+
                 return $timer_id;
 
-            default :
-                $fd_key    = (int)$fd;
+            default:
+                $fd_key = (int) $fd;
                 $real_flag = $flag === self::EV_READ ? EV_READ | EV_PERSIST : EV_WRITE | EV_PERSIST;
 
                 $event = event_new();
@@ -118,7 +123,6 @@ class Libevent implements EventInterface
 
                 return true;
         }
-
     }
 
     /**
@@ -129,7 +133,7 @@ class Libevent implements EventInterface
         switch ($flag) {
             case self::EV_READ:
             case self::EV_WRITE:
-                $fd_key = (int)$fd;
+                $fd_key = (int) $fd;
                 if (isset($this->_allEvents[$fd_key][$flag])) {
                     event_del($this->_allEvents[$fd_key][$flag]);
                     unset($this->_allEvents[$fd_key][$flag]);
@@ -139,7 +143,7 @@ class Libevent implements EventInterface
                 }
                 break;
             case  self::EV_SIGNAL:
-                $fd_key = (int)$fd;
+                $fd_key = (int) $fd;
                 if (isset($this->_eventSignal[$fd_key])) {
                     event_del($this->_eventSignal[$fd_key]);
                     unset($this->_eventSignal[$fd_key]);
@@ -147,13 +151,14 @@ class Libevent implements EventInterface
                 break;
             case self::EV_TIMER:
             case self::EV_TIMER_ONCE:
-                // 这里 fd 为timerid 
+                // 这里 fd 为timerid
                 if (isset($this->_eventTimer[$fd])) {
                     event_del($this->_eventTimer[$fd][2]);
                     unset($this->_eventTimer[$fd]);
                 }
                 break;
         }
+
         return true;
     }
 
@@ -191,7 +196,7 @@ class Libevent implements EventInterface
         foreach ($this->_eventTimer as $task_data) {
             event_del($task_data[2]);
         }
-        $this->_eventTimer = array();
+        $this->_eventTimer = [];
     }
 
     /**
@@ -214,4 +219,3 @@ class Libevent implements EventInterface
         }
     }
 }
-

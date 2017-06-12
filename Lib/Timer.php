@@ -8,13 +8,16 @@
  *
  * @author    walkor<walkor@workerman.net>
  * @copyright walkor<walkor@workerman.net>
+ *
  * @link      http://www.workerman.net/
+ *
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
+
 namespace Workerman\Lib;
 
-use Workerman\Events\EventInterface;
 use Exception;
+use Workerman\Events\EventInterface;
 
 /**
  * Timer.
@@ -30,14 +33,14 @@ class Timer
      *   run_time => [[$func, $args, $persistent, time_interval],[$func, $args, $persistent, time_interval],..]],
      *   run_time => [[$func, $args, $persistent, time_interval],[$func, $args, $persistent, time_interval],..]],
      *   ..
-     * ]
+     * ].
      *
      * @var array
      */
-    protected static $_tasks = array();
+    protected static $_tasks = [];
 
     /**
-     * event
+     * event.
      *
      * @var \Workerman\Events\EventInterface
      */
@@ -47,6 +50,7 @@ class Timer
      * Init.
      *
      * @param \Workerman\Events\EventInterface $event
+     *
      * @return void
      */
     public static function init($event = null)
@@ -54,7 +58,7 @@ class Timer
         if ($event) {
             self::$_event = $event;
         } else {
-            pcntl_signal(SIGALRM, array('\Workerman\Lib\Timer', 'signalHandle'), false);
+            pcntl_signal(SIGALRM, ['\Workerman\Lib\Timer', 'signalHandle'], false);
         }
     }
 
@@ -78,12 +82,14 @@ class Timer
      * @param callback $func
      * @param mixed    $args
      * @param bool     $persistent
+     *
      * @return int/false
      */
-    public static function add($time_interval, $func, $args = array(), $persistent = true)
+    public static function add($time_interval, $func, $args = [], $persistent = true)
     {
         if ($time_interval <= 0) {
-            echo new Exception("bad time_interval");
+            echo new Exception('bad time_interval');
+
             return false;
         }
 
@@ -93,7 +99,8 @@ class Timer
         }
 
         if (!is_callable($func)) {
-            echo new Exception("not callable");
+            echo new Exception('not callable');
+
             return false;
         }
 
@@ -104,12 +111,12 @@ class Timer
         $time_now = time();
         $run_time = $time_now + $time_interval;
         if (!isset(self::$_tasks[$run_time])) {
-            self::$_tasks[$run_time] = array();
+            self::$_tasks[$run_time] = [];
         }
-        self::$_tasks[$run_time][] = array($func, (array)$args, $persistent, $time_interval);
+        self::$_tasks[$run_time][] = [$func, (array) $args, $persistent, $time_interval];
+
         return 1;
     }
-
 
     /**
      * Tick.
@@ -120,6 +127,7 @@ class Timer
     {
         if (empty(self::$_tasks)) {
             pcntl_alarm(0);
+
             return;
         }
 
@@ -127,9 +135,9 @@ class Timer
         foreach (self::$_tasks as $run_time => $task_data) {
             if ($time_now >= $run_time) {
                 foreach ($task_data as $index => $one_task) {
-                    $task_func     = $one_task[0];
-                    $task_args     = $one_task[1];
-                    $persistent    = $one_task[2];
+                    $task_func = $one_task[0];
+                    $task_args = $one_task[1];
+                    $persistent = $one_task[2];
                     $time_interval = $one_task[3];
                     try {
                         call_user_func_array($task_func, $task_args);
@@ -149,6 +157,7 @@ class Timer
      * Remove a timer.
      *
      * @param mixed $timer_id
+     *
      * @return bool
      */
     public static function del($timer_id)
@@ -167,7 +176,7 @@ class Timer
      */
     public static function delAll()
     {
-        self::$_tasks = array();
+        self::$_tasks = [];
         pcntl_alarm(0);
         if (self::$_event) {
             self::$_event->clearAllTimer();
